@@ -1,7 +1,7 @@
 """Run a small reproducible export example, not an automatic image converter.
 
 python demo_model.py --out <new-directory> [--assembly]
-Requires dependencies from requirements.txt or CODEX_CAD_PACKAGES.
+Requires dependencies from requirements.txt or DRAWING_CAD_PACKAGES.
 """
 import argparse
 import math

@@ -7,6 +7,8 @@ description: 根据机械工程图、尺寸截图或草图建立参数化 CAD �
 
 生成有正确单位、可复建并经过重新读取校验的 CAD 文件。STEP 保留精确曲面和实体，GLB 从同一实体离散生成。先核对用户已有文件，保留用户要求保留的历史版本，输出到本任务独立目录。
 
+本技能采用通用 Agent Skills 格式，供支持 `SKILL.md` 的智能体使用。执行完整流程需要读取图纸图像、读写文件及运行终端/Python的能力；使用当前工具提供的等效能力，不要求任何厂商的专用API、MCP工具或模型。若当前工具缺少图像读取或代码执行能力，明确说明限制，交付可执行建模脚本或转到可执行环境，不声称已生成并校验文件。技能菜单、快捷命令及文件展示方式依宿主工具调整。
+
 ## 识图与尺寸处理
 
 - 实际查看全部相关图片/PDF，区分总装图、零件图、投影视图、剖面和明细表。局部放大只用于辨读，不能使未标注尺寸变成已知尺寸。
@@ -20,7 +22,7 @@ description: 根据机械工程图、尺寸截图或草图建立参数化 CAD �
 
 ## 建模与环境
 
-探测本机已有 CAD/Python 环境，优先复用可用的精确实体内核。需要时用 `mcp__codex_app__load_workspace_dependencies` 定位 Python，不依赖系统 `python` 别名一定可运行。新依赖放到独立虚拟环境或任务缓存，避免改动用户应用的依赖文件。
+探测当前执行环境已有的 CAD/Python：可用 `python --version`、`python3 --version`，Windows也可检查 `py -3.12 --version`；宿主若提供运行时定位工具可按需使用，但不是必要条件。确认实际可运行的解释器并优先复用精确实体内核。新依赖放到独立虚拟环境或任务缓存，避免改动用户应用的依赖文件。遵守宿主的执行、网络和文件权限。
 
 推荐 Python 3.12 + Open CASCADE 的 `cadquery-ocp`。依赖见 [scripts/requirements.txt](scripts/requirements.txt)。导出工具按 OCP 8.0.1.1.0 编写，更换绑定版本先核对接口。
 
@@ -29,7 +31,7 @@ description: 根据机械工程图、尺寸截图或草图建立参数化 CAD �
 <cad-env-python> -m pip install -r <skill-dir>/scripts/requirements.txt
 ```
 
-如果已有隔离依赖目录，可设置环境变量 `CODEX_CAD_PACKAGES`，工具会把它加入 Python 搜索路径。目录需实际探测；本会话曾用的 Temp 路径不能当成持久依赖。
+如果已有隔离依赖目录，可设置环境变量 `DRAWING_CAD_PACKAGES`，工具会把它加入 Python 搜索路径。目录需实际探测；案例中的 Temp 路径不能当成持久依赖。
 
 - 以 mm 建立 BRep 实体，采用明示坐标系，建议 X 水平、Y 向上、Z 为板厚/横向。圆角和圆孔用解析圆弧、圆柱及布尔运算，不把截图描成三角网格再包装成 STEP。
 - 把尺寸集中成参数，保留可重建的 `generate_model.py`。

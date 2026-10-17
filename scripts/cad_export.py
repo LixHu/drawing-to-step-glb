@@ -1,7 +1,7 @@
 """Exact OCP solids -> named STEP AP214 + metre/Y-up GLB + validation + preview.
 
 No modelling or filesystem writes occur on import. All input geometry is in mm.
-Set CODEX_CAD_PACKAGES only when reusing a separate dependency installation.
+Set DRAWING_CAD_PACKAGES only when reusing a separate dependency installation.
 """
 import json
 import math
@@ -11,8 +11,9 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-if os.environ.get('CODEX_CAD_PACKAGES'):
-    sys.path.insert(0, os.environ['CODEX_CAD_PACKAGES'])
+packages = os.environ.get('DRAWING_CAD_PACKAGES') or os.environ.get('CODEX_CAD_PACKAGES')
+if packages:  # The legacy environment name remains accepted for existing scripts.
+    sys.path.insert(0, packages)
 
 import numpy as np
 import trimesh
@@ -263,9 +264,21 @@ def render_preview(parts, meshes, path, title):
                 color = np.array(part.color[:3]) * (.42 + .55 * max(0., float(normal @ light)))
                 pixels[y0:y1+1, x0:x1+1][visible] = color
     image = Image.fromarray(pixels); draw = ImageDraw.Draw(image)
-    font_path = Path('C:/Windows/Fonts/msyh.ttc')
+    font_candidates = [
+        os.environ.get('DRAWING_CAD_FONT'),
+        'DejaVuSans.ttf',
+        'C:/Windows/Fonts/msyh.ttc',
+        '/System/Library/Fonts/Supplemental/Arial.ttf',
+        '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+    ]
     def font(size):
-        return ImageFont.truetype(str(font_path), size) if font_path.exists() else ImageFont.load_default()
+        for candidate in font_candidates:
+            if candidate:
+                try:
+                    return ImageFont.truetype(candidate, size)
+                except OSError:
+                    pass
+        return ImageFont.load_default()
     draw.text((35, 25), title, font=font(28), fill='#172334')
     draw.text((295, 100), 'Front', font=font(22), fill='#526174')
     draw.text((1000, 100), 'Oblique', font=font(22), fill='#526174')
