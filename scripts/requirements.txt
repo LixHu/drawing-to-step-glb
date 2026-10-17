@@ -1,0 +1,5 @@
+cadquery-ocp==8.0.1.1.0
+trimesh==5.1.1
+numpy==2.5.4
+Pillow==12.3.0
+networkx==3.7

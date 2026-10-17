@@ -1,0 +1,4 @@
+interface:
+  display_name: "图纸转 STEP 和 GLB"
+  short_description: "按工程图尺寸建模，导出并校验 STEP 实体和 GLB 模型"
+  default_prompt: "使用 $drawing-to-step-glb，根据提供的工程图和尺寸生成 STEP 与 GLB，核对尺寸冲突并注明补足项。"
